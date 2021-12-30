@@ -38,6 +38,7 @@ const userSchema = new Schema(
         // owner: {
         //     type: SchemaTypes.ObjectId,
         //     ref: 'user',
+        //     required: true,
         // },
     },
     {
@@ -61,6 +62,10 @@ userSchema.pre('save', async function (next) {
     }
     next();
 });
+
+userSchema.methods.isValidPassword = async function (password) {
+    return await bcryptjs.compare(password, this.password);
+};
 
 const User = model('user', userSchema);
 
