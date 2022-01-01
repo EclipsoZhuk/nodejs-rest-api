@@ -2,11 +2,11 @@ import { HttpCode } from '../../lib/constants';
 import repositoryContacts from '../../repository/contacts';
 
 const getContacts = async (req, res, next) => {
-    const contacts = await repositoryContacts.listContacts();
+    const contacts = await repositoryContacts.listContacts(req.query);
     res.status(HttpCode.OK).json({
         status: 'success',
         code: HttpCode.OK,
-        data: { count: contacts.length, contacts },
+        data: { ...contacts },
     });
 };
 

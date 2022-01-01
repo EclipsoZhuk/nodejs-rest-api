@@ -11,12 +11,13 @@ import {
     validateUpdate,
     validateId,
     validateUpdateFavorite,
+    validateQuery,
 } from '../../middlewares/contacts';
 import guard from '../../middlewares/users';
 
 const router = new Router();
 
-router.get('/', [guard], getContacts);
+router.get('/', [guard, validateQuery], getContacts);
 
 router.get('/:id', [guard, validateId], getContactById);
 
