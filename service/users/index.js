@@ -30,12 +30,17 @@ class AuthService {
     getToken(user) {
         const { id, email } = user;
         const payload = { id, email };
-        const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '8h' });
         return token;
     }
 
     async setToken(id, token) {
         await Users.updateToken(id, token);
+    }
+
+    async current(userId) {
+        const user = await Users.findById(userId);
+        return user;
     }
 }
 

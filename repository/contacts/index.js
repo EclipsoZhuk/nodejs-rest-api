@@ -1,15 +1,17 @@
 import Contact from '../../model/contact';
+// import mongoose from 'mongoose';
+// const { Types } = mongoose;
 
-const listContacts = async ({
-    sortBy,
-    sortByDesc,
-    filter,
-    limit = 10,
-    skip = 0,
-}) => {
+const listContacts = async (
+    userId,
+    { sortBy, sortByDesc, filter, limit = 10, skip = 0 },
+) => {
     let sortCriteria = null;
-    const total = await Contact.find().countDocuments();
-    let result = Contact.find();
+    const total = await Contact.find({ owner: userId }).countDocuments();
+    let result = Contact.find({ owner: userId }).populate({
+        path: 'owner',
+        select: 'name email age subscription',
+    });
     if (sortBy) {
         sortCriteria = { [`${sortBy}`]: 1 };
     }
@@ -26,16 +28,36 @@ const listContacts = async ({
     return { total, contacts: result };
 };
 
-const addContact = async body => await Contact.create(body);
+const addContact = async (userId, body) => {
+    const result = await Contact.create({ ...body, owner: userId });
+    return result;
+};
 
-const getContactById = async contactId => await Contact.findById(contactId);
+const getContactById = async (userId, contactId) => {
+    const result = await Contact.findOne({
+        _id: contactId,
+        owner: userId,
+    }).populate({
+        path: 'owner',
+        select: 'name email age subscription',
+    });
+    return result;
+};
 
-const removeContact = async contactId =>
-    await Contact.findByIdAndRemove(contactId);
+const removeContact = async (userId, contactId) => {
+    const result = await Contact.findOneAndRemove({
+        _id: contactId,
+        owner: userId,
+    });
+    return result;
+};
 
-const updateContact = async (contactId, body) => {
-    const result = await Contact.findByIdAndUpdate(
-        contactId,
+const updateContact = async (userId, contactId, body) => {
+    const result = await Contact.findOneAndUpdate(
+        {
+            _id: contactId,
+            owner: userId,
+        },
         { ...body },
         { new: true },
     );
