@@ -6,30 +6,30 @@ import {
     removeContact,
     updateContact,
 } from '../../controllers/contacts';
-
 import {
     validateCreate,
     validateUpdate,
     validateId,
     validateUpdateFavorite,
+    validateQuery,
 } from '../../middlewares/contacts';
+import guard from '../../middlewares/users';
 
 const router = new Router();
 
-router.get('/', getContacts);
+router.get('/', [guard, validateQuery], getContacts);
 
-router.get('/:id', validateId, getContactById);
+router.get('/:id', [guard, validateId], getContactById);
 
-router.post('/', validateCreate, addContact);
+router.post('/', [guard, validateCreate], addContact);
 
-router.delete('/:id', validateId, removeContact);
+router.delete('/:id', [guard, validateId], removeContact);
 
-router.put('/:id', validateId, validateUpdate, updateContact);
+router.put('/:id', [guard, validateId, validateUpdate], updateContact);
 
 router.patch(
     '/:id/favorite',
-    validateId,
-    validateUpdateFavorite,
+    [guard, validateId, validateUpdateFavorite],
     updateContact,
 );
 

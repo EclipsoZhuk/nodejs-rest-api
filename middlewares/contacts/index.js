@@ -24,6 +24,21 @@ const updateFavoriteSchema = Joi.object({
     favorite: Joi.bool().required(),
 });
 
+const regLimit = /\d+/;
+
+const querySchema = Joi.object({
+    limit: Joi.string().pattern(regLimit).optional(),
+    skip: Joi.number().min(0).optional(),
+    sortBy: Joi.string().valid('name', 'email', 'age', 'phone').optional(),
+    sortDesc: Joi.string().valid('name', 'email', 'age', 'phone').optional(),
+    filter: Joi.string()
+        .pattern(
+            // eslint-disable-next-line prefer-regex-literals
+            new RegExp('(name|email|age|phone)\\|?(name|email|age|phone)+'),
+        )
+        .optional(),
+});
+
 export const validateCreate = async (req, res, next) => {
     try {
         await createSchema.validateAsync(req.body);
@@ -70,6 +85,17 @@ export const validateId = async (req, res, next) => {
         return res
             .status(HttpCode.BAD_REQUEST)
             .json({ message: 'Invalid ObjectId' });
+    }
+    next();
+};
+
+export const validateQuery = async (req, res, next) => {
+    try {
+        await querySchema.validateAsync(req.query);
+    } catch (error) {
+        return res
+            .status(HttpCode.BAD_REQUEST)
+            .json({ message: `Field ${error.message.replace(/"/g, '')}` });
     }
     next();
 };
