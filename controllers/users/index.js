@@ -1,24 +1,27 @@
 import { HttpCode } from '../../lib/constants';
-import AuthService from '../../service/users';
-const usersService = new AuthService();
+import usersService from '../../service/users';
 
 const signup = async (req, res, next) => {
-    const { email } = req.body;
-    const isUserExist = await usersService.isUserExist(email);
-    if (isUserExist) {
-        return res.status(HttpCode.CONFLICT).json({
-            status: 'Conflict',
-            code: HttpCode.CONFLICT,
-            message: 'Email in use',
-        });
-    }
-    const data = await usersService.create(req.body);
+    try {
+        const { email } = req.body;
+        const isUserExist = await usersService.isUserExist(email);
+        if (isUserExist) {
+            return res.status(HttpCode.CONFLICT).json({
+                status: 'Conflict',
+                code: HttpCode.CONFLICT,
+                message: 'Email in use',
+            });
+        }
+        const data = await usersService.create(req.body);
 
-    res.status(HttpCode.CREATED).json({
-        status: 'Created',
-        code: HttpCode.CREATED,
-        user: data,
-    });
+        res.status(HttpCode.CREATED).json({
+            status: 'Created',
+            code: HttpCode.CREATED,
+            user: data,
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
 const login = async (req, res, next) => {
