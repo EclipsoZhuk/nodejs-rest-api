@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import gravatar from 'gravatar';
 import bcryptjs from 'bcryptjs';
 import { Subscription } from '../../lib/constants';
 
@@ -35,11 +36,16 @@ const userSchema = new Schema(
             type: String,
             default: null,
         },
-        // owner: {
-        //     type: SchemaTypes.ObjectId,
-        //     ref: 'user',
-        //     required: true,
-        // },
+        avatarURL: {
+            type: String,
+            default: function () {
+                return gravatar.url(this.email, { s: '250' }, true);
+            },
+        },
+        idAvatarCloud: {
+            type: String,
+            default: null,
+        },
     },
     {
         versionKey: false,
